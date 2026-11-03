@@ -1,0 +1,5 @@
+error: Unknown field: `unknown`. Available values: `default`, `nested`, `parser`, `rename`, `var`
+ --> tests/ui/unknown_attribute.rs:5:11
+  |
+5 |     #[env(unknown = "x")]
+  |           ^^^^^^^

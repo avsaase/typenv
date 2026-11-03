@@ -1,0 +1,14 @@
+error[E0277]: the trait bound `{integer}: Parser<u32>` is not satisfied
+ --> tests/ui/parser_not_a_parser.rs:5:20
+  |
+5 |     #[env(parser = 42)]
+  |                    ^^ the trait `for<'a> Fn(&'a str)` is not implemented for `{integer}`
+6 |     field: u32,
+  |            --- required by a bound introduced by this call
+  |
+  = note: required for `{integer}` to implement `Parser<u32>`
+note: required by a bound in `required`
+ --> src/private.rs
+  |
+  | pub fn required<T>(path: &str, var: &str, parser: &impl Parser<T>) -> Result<T, FromEnvError> {
+  |                                                         ^^^^^^^^^ required by this bound in `required`

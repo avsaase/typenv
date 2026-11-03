@@ -1,0 +1,87 @@
+use proc_macro2::{Span, TokenStream};
+use quote::{format_ident, quote, quote_spanned};
+use syn::{Ident, spanned::Spanned};
+
+use crate::model::{Container, Field, FieldKind, Mode, ValueField};
+
+pub fn expand(container: &Container) -> TokenStream {
+    let ident = &container.ident;
+    let (impl_generics, ty_generics, where_clause) = container.generics.split_for_impl();
+    let fields = &container.fields;
+
+    let errors = Ident::new("errors", Span::mixed_site());
+    let field_idents = fields.iter().map(|field| &field.ident);
+    let locals: Vec<Ident> = (0..fields.len())
+        .map(|i| format_ident!("field_{}", i, span = Span::mixed_site()))
+        .collect();
+    let collects = fields.iter().map(|field| field_collect(field, &errors));
+
+    let body = if fields.is_empty() {
+        quote! { ::core::result::Result::Ok(Self {}) }
+    } else {
+        quote! {
+            let mut #errors = ::from_env::__private::ErrorCollector::new();
+
+            #( let #locals = #collects; )*
+
+            let (#(::core::option::Option::Some(#locals),)*) = (#(#locals,)*) else {
+                return ::core::result::Result::Err(#errors.finish());
+            };
+
+            ::core::result::Result::Ok(Self { #(#field_idents: #locals,)* })
+        }
+    };
+
+    quote! {
+        impl #impl_generics ::from_env::FromEnv for #ident #ty_generics #where_clause {
+            fn from_env() -> ::core::result::Result<Self, ::from_env::FromEnvErrors> {
+                #body
+            }
+        }
+    }
+}
+
+/// An expression that loads one field, evaluating to `Option<T>`: `Some` on
+/// success, `None` after recording the error(s) in `errors`.
+fn field_collect(field: &Field, errors: &Ident) -> TokenStream {
+    let path = &field.path;
+    let span = field.span;
+
+    match &field.kind {
+        FieldKind::Nested { ty } => quote_spanned! {span=>
+            #errors.handle_nested(#path, <#ty as ::from_env::FromEnv>::from_env())
+        },
+        FieldKind::Value(value) => {
+            let call = value_call(path, span, value);
+            quote! { #errors.handle(#call) }
+        }
+    }
+}
+
+fn value_call(path: &str, span: Span, value: &ValueField) -> TokenStream {
+    let ValueField {
+        var,
+        ty,
+        parser,
+        mode,
+    } = value;
+
+    let parser = match parser {
+        Some(parser) => quote_spanned! {parser.span()=> &(#parser) },
+        None => quote_spanned! {span=> &::from_env::parser::from_str::<#ty> },
+    };
+
+    // The explicit `::<#ty>` lets generic parsers such as `parser::json` infer
+    // their output type from the field.
+    match mode {
+        Mode::Required => quote_spanned! {span=>
+            ::from_env::__private::required::<#ty>(#path, #var, #parser)
+        },
+        Mode::Optional => quote_spanned! {span=>
+            ::from_env::__private::optional::<#ty>(#path, #var, #parser)
+        },
+        Mode::Default(default) => quote_spanned! {span=>
+            ::from_env::__private::with_default::<#ty>(#path, #var, #default, #parser)
+        },
+    }
+}

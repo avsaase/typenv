@@ -1,0 +1,5 @@
+error: `nested` cannot be used with other attributes.
+ --> tests/ui/nested_with_var.rs:8:11
+  |
+8 |     #[env(nested, var = "A")]
+  |           ^^^^^^

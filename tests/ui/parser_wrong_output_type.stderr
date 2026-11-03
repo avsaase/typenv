@@ -1,0 +1,16 @@
+error[E0271]: expected `parse` to return `Result<u32, Box<dyn Error + Send + Sync>>`, but it returns `Result<String, Box<dyn Error + Send + Sync>>`
+  --> tests/ui/parser_wrong_output_type.rs:9:20
+   |
+ 9 |     #[env(parser = parse)]
+   |                    ^^^^^ expected `Result<u32, Box<_>>`, found `Result<String, Box<_>>`
+10 |     field: u32,
+   |            --- required by a bound introduced by this call
+   |
+   = note: expected enum `Result<u32, Box<(dyn std::error::Error + Send + Sync + 'static)>>`
+              found enum `Result<String, Box<(dyn std::error::Error + Send + Sync + 'static)>>`
+   = note: required for `for<'a> fn(&'a str) -> Result<String, Box<(dyn std::error::Error + Send + Sync + 'static)>> {parse}` to implement `Parser<u32>`
+note: required by a bound in `required`
+  --> src/private.rs
+   |
+   | pub fn required<T>(path: &str, var: &str, parser: &impl Parser<T>) -> Result<T, FromEnvError> {
+   |                                                         ^^^^^^^^^ required by this bound in `required`
