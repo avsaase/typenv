@@ -38,8 +38,7 @@ where
     Ok(s.to_owned().into())
 }
 
-/// Converts with [`TryFrom<String>`]. The error type has the same requirements as for
-/// [`from_str`].
+/// Converts with [`TryFrom<String>`]. The error type has the same requirements as for [`from_str`].
 pub fn try_into<T>(s: &str) -> ParseResult<T>
 where
     T: TryFrom<String>,
@@ -54,7 +53,7 @@ pub fn json<T>(s: &str) -> ParseResult<T>
 where
     T: serde::de::DeserializeOwned,
 {
-    serde_json::from_str(s).map_err(|e| e.into())
+    serde_json::from_str(s).map_err(Into::into)
 }
 
 impl<T, F> Parser<T> for F

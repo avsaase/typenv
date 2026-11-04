@@ -13,8 +13,8 @@ pub struct Field {
     pub ident: Ident,
     /// The field's name without `r#`, used as its path in error messages.
     pub path: String,
-    /// Span of the field's type, used for the generated code so that type
-    /// errors point at the field.
+    /// Span of the field's type, used for the generated code so that type errors point at the
+    /// field.
     pub span: Span,
     pub kind: FieldKind,
 }
@@ -43,7 +43,7 @@ pub enum Mode {
     Optional,
     /// A missing variable falls back to parsing this string.
     Default(String),
-    /// A missing variable falls back to this typed expression, which is only
-    /// evaluated when needed and never passed through the parser.
+    /// A missing variable falls back to this typed expression, which is only evaluated when needed
+    /// and never passed through the parser.
     DefaultValue(Expr),
 }

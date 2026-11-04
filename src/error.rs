@@ -7,18 +7,16 @@ pub type BoxError = Box<dyn StdError + Send + Sync + 'static>;
 /// Every error encountered while loading a struct, returned by
 /// [`FromEnv::from_env`](crate::FromEnv::from_env).
 ///
-/// Loading does not stop at the first problem, so this reports all missing and
-/// invalid variables at once. Its `Display` output lists each error together
-/// with its cause.
+/// Loading does not stop at the first problem, so this reports all missing and invalid variables at
+/// once. Its `Display` output lists each error together with its cause.
 #[derive(Debug)]
 pub struct FromEnvErrors(pub(crate) Vec<FromEnvError>);
 
 /// A single problem with one field.
 ///
 /// Every variant has a `path`, the field's location from the struct
-/// [`from_env`](crate::FromEnv::from_env) was called on, with nested fields
-/// joined by dots (e.g. `database.port`), and a `var`, the environment
-/// variable that was read.
+/// [`from_env`](crate::FromEnv::from_env) was called on, with nested fields joined by dots (e.g.
+/// `database.port`), and a `var`, the environment variable that was read.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum FromEnvError {
@@ -27,19 +25,18 @@ pub enum FromEnvError {
         path: String,
         var: String,
     },
-    /// A variable is set, but its value could not be parsed. The parser's
-    /// error is available through [`source`](StdError::source).
+    /// A variable is set, but its value could not be parsed. The parser's error is available
+    /// through [`source`](StdError::source).
     ParseError {
         path: String,
         var: String,
-        /// The variable's value. Values that are not valid Unicode are
-        /// converted lossily.
+        /// The variable's value. Values that are not valid Unicode are converted lossily.
         value: String,
         source: BoxError,
     },
-    /// A variable is not set and the field's `#[env(default = "...")]` could
-    /// not be parsed. This is a bug in the code, not in the environment. The
-    /// parser's error is available through [`source`](StdError::source).
+    /// A variable is not set and the field's `#[env(default = "...")]` could not be parsed. This is
+    /// a bug in the code, not in the environment. The parser's error is available through
+    /// [`source`](StdError::source).
     InvalidDefault {
         path: String,
         var: String,

@@ -39,8 +39,8 @@ struct FromEnvReceiver {
     ident: Ident,
     generics: Generics,
     data: ast::Data<(), FieldReceiver>,
-    /// Prepended verbatim to the variable names of this struct's fields,
-    /// except fields with an explicit `var`. Not inherited by nested structs.
+    /// Prepended verbatim to the variable names of this struct's fields, except fields with an
+    /// explicit `var`. Not inherited by nested structs.
     prefix: Option<String>,
 }
 

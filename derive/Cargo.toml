@@ -11,3 +11,8 @@ darling = "0.21"
 proc-macro2 = "1.0"
 quote = "1.0"
 syn = { version = "2.0", features = ["derive", "parsing"] }
+
+[dev-dependencies]
+# For the doc examples. Cargo allows this cycle for dev-dependencies.
+from-env = { path = ".." }
+temp-env = "0.3.6"
