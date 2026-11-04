@@ -76,7 +76,7 @@ impl FieldReceiver {
         if self.var.is_some()
             && let Some(rename) = &self.rename
         {
-            errors.push(error(rename.span(), "`rename` cannot be used with `var`."));
+            errors.push(error(rename.span(), "`rename` cannot be used with `var`"));
         }
 
         if is_optional && let Some(default) = &self.default {
@@ -90,7 +90,7 @@ impl FieldReceiver {
             if self.default.is_some() {
                 errors.push(error(
                     default_value.span(),
-                    "`default_value` cannot be used with `default`.",
+                    "`default_value` cannot be used with `default`",
                 ));
             }
 
@@ -106,14 +106,14 @@ impl FieldReceiver {
             if has_var_settings {
                 errors.push(error(
                     self.nested.span(),
-                    "`nested` cannot be used with other attributes.",
+                    "`nested` cannot be used with other attributes",
                 ));
             }
 
             if is_optional {
                 errors.push(error(
                     self.nested.span(),
-                    "`nested` cannot be used on an optional field.",
+                    "`nested` cannot be used on an optional field",
                 ));
             }
         }

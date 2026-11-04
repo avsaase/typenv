@@ -1,4 +1,4 @@
-error: `nested` cannot be used with other attributes.
+error: `nested` cannot be used with other attributes
   --> tests/ui/nested_with_parser.rs:12:11
    |
 12 |     #[env(nested, parser = parse)]

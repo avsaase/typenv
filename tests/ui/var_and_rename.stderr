@@ -1,4 +1,4 @@
-error: `rename` cannot be used with `var`.
+error: `rename` cannot be used with `var`
  --> tests/ui/var_and_rename.rs:5:31
   |
 5 |     #[env(var = "A", rename = "b")]

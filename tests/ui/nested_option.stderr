@@ -1,4 +1,4 @@
-error: `nested` cannot be used on an optional field.
+error: `nested` cannot be used on an optional field
  --> tests/ui/nested_option.rs:8:11
   |
 8 |     #[env(nested)]
