@@ -27,8 +27,17 @@ pub fn with_default<T>(
     default: &str,
     parser: &impl Parser<T>,
 ) -> Result<T, FromEnvError> {
-    let value = read(path, var)?.unwrap_or_else(|| default.to_owned());
-    parse(path, var, value, parser)
+    match read(path, var)? {
+        Some(value) => parse(path, var, value, parser),
+        None => parser
+            .parse(default)
+            .map_err(|error| FromEnvError::InvalidDefault {
+                path: path.to_string(),
+                var: var.to_string(),
+                default: default.to_string(),
+                source: error,
+            }),
+    }
 }
 
 fn read(path: &str, var: &str) -> Result<Option<String>, FromEnvError> {
@@ -90,7 +99,8 @@ impl ErrorCollector {
                 self.0.extend(errors.into_iter().map(|mut error| {
                     match &mut error {
                         FromEnvError::MissingVar { path, .. }
-                        | FromEnvError::ParseError { path, .. } => {
+                        | FromEnvError::ParseError { path, .. }
+                        | FromEnvError::InvalidDefault { path, .. } => {
                             *path = format!("{prefix}.{path}");
                         }
                     }

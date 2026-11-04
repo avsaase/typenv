@@ -138,7 +138,7 @@ fn default_overridden_when_present() {
 }
 
 #[test]
-fn invalid_default_is_a_parse_error() {
+fn invalid_default_is_reported_as_invalid_default() {
     #[derive(FromEnv, Debug)]
     struct Config {
         #[allow(dead_code)]
@@ -151,8 +151,40 @@ fn invalid_default_is_a_parse_error() {
         assert_eq!(
             error.to_string(),
             "Configuration errors:\n  \
-             - `fields_bad_default`: Failed to parse environment variable \
-             `FIELDS_BAD_DEFAULT=\"not a number\"`: invalid digit found in string\n"
+             - `fields_bad_default`: Invalid default value \"not a number\" for \
+             `FIELDS_BAD_DEFAULT` (variable is not set): invalid digit found in string\n"
+        );
+    });
+}
+
+#[test]
+fn invalid_default_is_ignored_when_var_is_set() {
+    #[derive(FromEnv)]
+    struct Config {
+        #[env(default = "not a number")]
+        fields_bad_default_set: u16,
+    }
+
+    temp_env::with_var("FIELDS_BAD_DEFAULT_SET", Some("1"), || {
+        assert_eq!(Config::from_env().unwrap().fields_bad_default_set, 1);
+    });
+}
+
+#[test]
+fn invalid_env_value_with_default_is_a_parse_error() {
+    #[derive(FromEnv, Debug)]
+    struct Config {
+        #[allow(dead_code)]
+        #[env(default = "1")]
+        fields_default_bad_value: u16,
+    }
+
+    temp_env::with_var("FIELDS_DEFAULT_BAD_VALUE", Some("abc"), || {
+        assert_eq!(
+            Config::from_env().unwrap_err().to_string(),
+            "Configuration errors:\n  \
+             - `fields_default_bad_value`: Failed to parse environment variable \
+             `FIELDS_DEFAULT_BAD_VALUE=\"abc\"`: invalid digit found in string\n"
         );
     });
 }

@@ -83,3 +83,29 @@ fn deeply_nested_paths() {
         );
     });
 }
+
+#[test]
+fn nested_invalid_default_is_prefixed() {
+    #[derive(FromEnv, Debug)]
+    struct Outer {
+        #[allow(dead_code)]
+        #[env(nested)]
+        inner: Inner,
+    }
+
+    #[derive(FromEnv, Debug)]
+    struct Inner {
+        #[allow(dead_code)]
+        #[env(default = "x")]
+        nested_bad_default: u8,
+    }
+
+    temp_env::with_var_unset("NESTED_BAD_DEFAULT", || {
+        assert_eq!(
+            Outer::from_env().unwrap_err().to_string(),
+            "Configuration errors:\n  \
+             - `inner.nested_bad_default`: Invalid default value \"x\" for \
+             `NESTED_BAD_DEFAULT` (variable is not set): invalid digit found in string\n"
+        );
+    });
+}

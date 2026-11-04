@@ -18,6 +18,12 @@ pub enum FromEnvError {
         value: String,
         source: BoxError,
     },
+    InvalidDefault {
+        path: String,
+        var: String,
+        default: String,
+        source: BoxError,
+    },
 }
 
 impl Display for FromEnvErrors {
@@ -55,6 +61,12 @@ impl Display for FromEnvError {
                 f,
                 "`{path}`: Failed to parse environment variable `{var}=\"{value}\"`"
             ),
+            FromEnvError::InvalidDefault {
+                path, var, default, ..
+            } => write!(
+                f,
+                "`{path}`: Invalid default value \"{default}\" for `{var}` (variable is not set)"
+            ),
         }
     }
 }
@@ -65,7 +77,8 @@ impl StdError for FromEnvError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             FromEnvError::MissingVar { .. } => None,
-            FromEnvError::ParseError { source, .. } => Some(source.as_ref()),
+            FromEnvError::ParseError { source, .. }
+            | FromEnvError::InvalidDefault { source, .. } => Some(source.as_ref()),
         }
     }
 }
