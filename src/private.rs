@@ -88,6 +88,7 @@ pub fn parse<T>(
         })
 }
 
+#[derive(Default)]
 pub struct ErrorCollector(Vec<FromEnvError>);
 
 impl ErrorCollector {

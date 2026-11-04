@@ -19,6 +19,10 @@ pub struct Field {
     pub kind: FieldKind,
 }
 
+#[expect(
+    clippy::large_enum_variant,
+    reason = "built once per field at compile time, so size does not matter"
+)]
 pub enum FieldKind {
     /// `#[env(nested)]`: loaded through the type's own `FromEnv` impl.
     Nested { ty: Type },

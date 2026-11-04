@@ -180,7 +180,7 @@ fn default_is_parsed_with_custom_parser() {
 fn parser_errors_are_reported() {
     fn even(s: &str) -> ParseResult<u32> {
         let n: u32 = s.parse()?;
-        if n % 2 == 0 {
+        if n.is_multiple_of(2) {
             Ok(n)
         } else {
             Err(format!("{n} is not even").into())
