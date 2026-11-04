@@ -1,5 +1,6 @@
 pub use from_env_derive::FromEnv;
 
+#[doc(hidden)]
 #[path = "private.rs"]
 pub mod __private;
 
