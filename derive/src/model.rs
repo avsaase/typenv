@@ -1,7 +1,8 @@
 use proc_macro2::Span;
-use syn::{Expr, Generics, Ident, Type};
+use syn::{Expr, Generics, Ident, Type, Visibility};
 
 pub struct Container {
+    pub vis: Visibility,
     pub ident: Ident,
     pub generics: Generics,
     pub fields: Vec<Field>,

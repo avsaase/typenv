@@ -4,7 +4,8 @@ use darling::{
 };
 use proc_macro2::Span;
 use syn::{
-    DeriveInput, Expr, GenericArgument, Generics, Ident, PathArguments, Type, ext::IdentExt,
+    DeriveInput, Expr, GenericArgument, Generics, Ident, PathArguments, Type, Visibility,
+    ext::IdentExt,
     spanned::Spanned,
 };
 
@@ -24,6 +25,7 @@ pub fn parse(ast: &DeriveInput) -> darling::Result<Container> {
         .collect();
 
     Ok(Container {
+        vis: receiver.vis,
         ident: receiver.ident,
         generics: receiver.generics,
         fields,
@@ -33,7 +35,7 @@ pub fn parse(ast: &DeriveInput) -> darling::Result<Container> {
 #[derive(FromDeriveInput)]
 #[darling(attributes(env), supports(struct_named))]
 struct FromEnvReceiver {
-    // vis: Visibility,
+    vis: Visibility,
     ident: Ident,
     generics: Generics,
     data: ast::Data<(), FieldReceiver>,
