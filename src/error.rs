@@ -21,10 +21,7 @@ pub struct FromEnvErrors(pub(crate) Vec<FromEnvError>);
 #[non_exhaustive]
 pub enum FromEnvError {
     /// A required variable is not set.
-    MissingVar {
-        path: String,
-        var: String,
-    },
+    MissingVar { path: String, var: String },
     /// A variable is set, but its value could not be parsed. The parser's error is available
     /// through [`source`](StdError::source).
     ParseError {

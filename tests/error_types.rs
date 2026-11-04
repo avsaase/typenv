@@ -23,11 +23,7 @@ macro_rules! level_with_error {
 level_with_error!(StringErr, String, "bad level".to_owned());
 level_with_error!(StrErr, &'static str, "bad level");
 level_with_error!(BoxedErr, BoxError, "bad level".into());
-level_with_error!(
-    StdErr,
-    std::io::Error,
-    std::io::Error::other("bad level")
-);
+level_with_error!(StdErr, std::io::Error, std::io::Error::other("bad level"));
 
 #[derive(Debug, PartialEq)]
 struct Anything(String);
@@ -129,7 +125,10 @@ fn try_into_with_string_error() {
     }
 
     temp_env::with_var("ET_NON_EMPTY", Some("x"), || {
-        assert_eq!(Config::from_env().unwrap().et_non_empty, NonEmpty("x".into()));
+        assert_eq!(
+            Config::from_env().unwrap().et_non_empty,
+            NonEmpty("x".into())
+        );
     });
 
     temp_env::with_var("ET_NON_EMPTY", Some(""), || {
@@ -154,6 +153,9 @@ fn generic_struct_bound_is_simpler() {
     }
 
     temp_env::with_var("ET_GENERIC", Some("ok"), || {
-        assert_eq!(Config::<StringErr>::from_env().unwrap().et_generic, StringErr);
+        assert_eq!(
+            Config::<StringErr>::from_env().unwrap().et_generic,
+            StringErr
+        );
     });
 }

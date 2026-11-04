@@ -5,8 +5,7 @@ use darling::{
 use proc_macro2::Span;
 use syn::{
     DeriveInput, Expr, GenericArgument, Generics, Ident, PathArguments, Type, Visibility,
-    ext::IdentExt,
-    spanned::Spanned,
+    ext::IdentExt, spanned::Spanned,
 };
 
 use crate::model::{Container, Field, FieldKind, Mode, ValueField};
