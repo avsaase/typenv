@@ -7,6 +7,7 @@ pub type BoxError = Box<dyn StdError + Send + Sync + 'static>;
 pub struct FromEnvErrors(pub(crate) Vec<FromEnvError>);
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum FromEnvError {
     MissingVar {
         path: String,
