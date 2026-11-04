@@ -42,4 +42,7 @@ pub enum Mode {
     Optional,
     /// A missing variable falls back to parsing this string.
     Default(String),
+    /// A missing variable falls back to this typed expression, which is only
+    /// evaluated when needed and never passed through the parser.
+    DefaultValue(Expr),
 }

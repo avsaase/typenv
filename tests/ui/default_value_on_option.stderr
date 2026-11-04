@@ -1,0 +1,5 @@
+error: `default_value` cannot be used on an optional field
+ --> tests/ui/default_value_on_option.rs:5:27
+  |
+5 |     #[env(default_value = Some(1))]
+  |                           ^^^^

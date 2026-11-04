@@ -1,0 +1,5 @@
+error: `default_value` cannot be used with `default`.
+ --> tests/ui/default_value_and_default.rs:5:42
+  |
+5 |     #[env(default = "1", default_value = 1)]
+  |                                          ^

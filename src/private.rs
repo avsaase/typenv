@@ -40,6 +40,20 @@ pub fn with_default<T>(
     }
 }
 
+/// Like [`with_default`], but the default is a typed value. It is only
+/// computed when the variable is unset and is not passed through the parser.
+pub fn with_default_value<T>(
+    path: &str,
+    var: &str,
+    default: impl FnOnce() -> T,
+    parser: &impl Parser<T>,
+) -> Result<T, FromEnvError> {
+    match read(path, var)? {
+        Some(value) => parse(path, var, value, parser),
+        None => Ok(default()),
+    }
+}
+
 fn read(path: &str, var: &str) -> Result<Option<String>, FromEnvError> {
     match std::env::var(var) {
         Ok(value) => Ok(Some(value)),

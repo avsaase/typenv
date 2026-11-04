@@ -83,5 +83,12 @@ fn value_call(path: &str, span: Span, value: &ValueField) -> TokenStream {
         Mode::Default(default) => quote_spanned! {span=>
             ::from_env::__private::with_default::<#ty>(#path, #var, #default, #parser)
         },
+        Mode::DefaultValue(value) => {
+            // Spanned at the expression so a type mismatch points at it.
+            let default = quote_spanned! {value.span()=> || #value };
+            quote_spanned! {span=>
+                ::from_env::__private::with_default_value::<#ty>(#path, #var, #default, #parser)
+            }
+        }
     }
 }

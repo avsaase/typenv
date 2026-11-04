@@ -49,6 +49,9 @@ struct FieldReceiver {
     ty: Type,
     var: Option<SpannedValue<String>>,
     default: Option<SpannedValue<String>>,
+    /// A typed default; string literals are kept as literals, not parsed as code.
+    #[darling(default, with = darling::util::parse_expr::preserve_str_literal, map = Some)]
+    default_value: Option<Expr>,
     rename: Option<SpannedValue<String>>,
     /// Any expression implementing `from_env::Parser<T>`, e.g. a function path or closure.
     parser: Option<Expr>,
@@ -66,6 +69,7 @@ impl FieldReceiver {
         let is_optional = option_inner(&self.ty).is_some();
         let has_var_settings = self.var.is_some()
             || self.default.is_some()
+            || self.default_value.is_some()
             || self.rename.is_some()
             || self.parser.is_some();
 
@@ -80,6 +84,22 @@ impl FieldReceiver {
                 default.span(),
                 "`default` cannot be used on an optional field",
             ));
+        }
+
+        if let Some(default_value) = &self.default_value {
+            if self.default.is_some() {
+                errors.push(error(
+                    default_value.span(),
+                    "`default_value` cannot be used with `default`.",
+                ));
+            }
+
+            if is_optional {
+                errors.push(error(
+                    default_value.span(),
+                    "`default_value` cannot be used on an optional field",
+                ));
+            }
         }
 
         if self.nested.is_present() {
@@ -118,10 +138,11 @@ impl FieldReceiver {
                 (None, None) => format!("{prefix}{}", path.to_uppercase()),
             };
 
-            let (ty, mode) = match (option_inner(&self.ty), self.default) {
-                (Some(inner), _) => (inner.clone(), Mode::Optional),
-                (None, Some(default)) => (self.ty, Mode::Default(default.into_inner())),
-                (None, None) => (self.ty, Mode::Required),
+            let (ty, mode) = match (option_inner(&self.ty), self.default, self.default_value) {
+                (Some(inner), _, _) => (inner.clone(), Mode::Optional),
+                (None, Some(default), _) => (self.ty, Mode::Default(default.into_inner())),
+                (None, None, Some(value)) => (self.ty, Mode::DefaultValue(value)),
+                (None, None, None) => (self.ty, Mode::Required),
             };
 
             FieldKind::Value(ValueField {
@@ -231,12 +252,21 @@ mod tests {
                 optional: Option<u16>,
                 #[env(default = "5")]
                 defaulted: u16,
+                #[env(default_value = 5)]
+                typed: u16,
+                #[env(default_value = "five")]
+                typed_str: &'static str,
             }
         });
 
         assert!(matches!(value(&fields[0]).mode, Mode::Required));
         assert!(matches!(value(&fields[1]).mode, Mode::Optional));
         assert!(matches!(&value(&fields[2]).mode, Mode::Default(d) if d == "5"));
+        assert!(matches!(&value(&fields[3]).mode, Mode::DefaultValue(e) if tokens(e) == "5"));
+        assert!(
+            matches!(&value(&fields[4]).mode, Mode::DefaultValue(e) if tokens(e) == "\"five\""),
+            "string literals must stay string literals"
+        );
     }
 
     #[test]

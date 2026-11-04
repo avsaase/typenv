@@ -1,0 +1,5 @@
+error[E0308]: mismatched types
+ --> tests/ui/default_value_wrong_type.rs:5:27
+  |
+5 |     #[env(default_value = "8080")]
+  |                           ^^^^^^ expected `u16`, found `&str`

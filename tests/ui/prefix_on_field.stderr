@@ -1,4 +1,4 @@
-error: Unknown field: `prefix`. Available values: `default`, `nested`, `parser`, `rename`, `var`
+error: Unknown field: `prefix`. Available values: `default`, `default_value`, `nested`, `parser`, `rename`, `var`
  --> tests/ui/prefix_on_field.rs:5:11
   |
 5 |     #[env(prefix = "APP_")]
