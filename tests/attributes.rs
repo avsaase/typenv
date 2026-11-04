@@ -10,7 +10,10 @@ fn field_name_is_uppercased() {
     }
 
     temp_env::with_vars(
-        [("ATTRS_DB_URL", Some("upper")), ("attrs_db_url", Some("lower"))],
+        [
+            ("ATTRS_DB_URL", Some("upper")),
+            ("attrs_db_url", Some("lower")),
+        ],
         || {
             assert_eq!(Config::from_env().unwrap().attrs_db_url, "upper");
         },

@@ -25,7 +25,17 @@ impl Display for FromEnvErrors {
         writeln!(f, "Configuration errors:")?;
 
         for error in &self.0 {
-            writeln!(f, "  - {error}")?;
+            write!(f, "  - {error}")?;
+
+            // `FromEnvError` leaves its cause to `source()`, so render the
+            // whole chain here to keep the list self-contained.
+            let mut source = error.source();
+            while let Some(cause) = source {
+                write!(f, ": {cause}")?;
+                source = cause.source();
+            }
+
+            writeln!(f)?;
         }
 
         Ok(())
@@ -40,13 +50,10 @@ impl Display for FromEnvError {
                 "`{path}`: Missing required environment variable: `{var}`"
             ),
             FromEnvError::ParseError {
-                path,
-                var,
-                value,
-                source,
+                path, var, value, ..
             } => write!(
                 f,
-                "`{path}`: Failed to parse environment variable `{var}=\"{value}\"`: {source}"
+                "`{path}`: Failed to parse environment variable `{var}=\"{value}\"`"
             ),
         }
     }
