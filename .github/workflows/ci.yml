@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # cargo-reedme builds rustdoc JSON with nightly. Install it first so stable, installed
+      # second, is the default toolchain for everything else.
+      - uses: dtolnay/rust-toolchain@nightly
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
