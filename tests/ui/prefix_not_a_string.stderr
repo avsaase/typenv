@@ -1,0 +1,5 @@
+error: Unexpected type `int`
+ --> tests/ui/prefix_not_a_string.rs:4:16
+  |
+4 | #[env(prefix = 42)]
+  |                ^^

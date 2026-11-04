@@ -13,13 +13,14 @@ use crate::model::{Container, Field, FieldKind, Mode, ValueField};
 pub fn parse(ast: &DeriveInput) -> darling::Result<Container> {
     let receiver = FromEnvReceiver::from_derive_input(ast)?;
 
+    let prefix = receiver.prefix.unwrap_or_default();
     let fields = receiver
         .data
         .take_struct()
         .expect("darling only accepts structs with named fields")
         .fields
         .into_iter()
-        .map(FieldReceiver::into_model)
+        .map(|field| field.into_model(&prefix))
         .collect();
 
     Ok(Container {
@@ -36,6 +37,9 @@ struct FromEnvReceiver {
     ident: Ident,
     generics: Generics,
     data: ast::Data<(), FieldReceiver>,
+    /// Prepended verbatim to the variable names of this struct's fields,
+    /// except fields with an explicit `var`. Not inherited by nested structs.
+    prefix: Option<String>,
 }
 
 #[derive(FromField)]
@@ -98,7 +102,9 @@ impl FieldReceiver {
     }
 
     /// Converts a field that has passed [`Self::validate`] into the model.
-    fn into_model(self) -> Field {
+    ///
+    /// `prefix` is the struct's `#[env(prefix = ..)]`, or empty.
+    fn into_model(self, prefix: &str) -> Field {
         let ident = self.ident.expect("darling only accepts named fields");
         let path = ident.unraw().to_string();
         let span = self.ty.span();
@@ -108,8 +114,8 @@ impl FieldReceiver {
         } else {
             let var = match (self.var, self.rename) {
                 (Some(var), _) => var.into_inner(),
-                (None, Some(rename)) => rename.into_inner().to_uppercase(),
-                (None, None) => path.to_uppercase(),
+                (None, Some(rename)) => format!("{prefix}{}", rename.to_uppercase()),
+                (None, None) => format!("{prefix}{}", path.to_uppercase()),
             };
 
             let (ty, mode) = match (option_inner(&self.ty), self.default) {
@@ -195,6 +201,26 @@ mod tests {
         assert_eq!(vars, ["DB_URL", "exact_Name", "RENAMED", "TYPE"]);
         assert_eq!(fields[3].path, "type");
         assert_eq!(fields[3].ident.to_string(), "r#type");
+    }
+
+    #[test]
+    fn prefix() {
+        let fields = parse_fields(parse_quote! {
+            #[env(prefix = "App_")]
+            struct Config {
+                db_url: String,
+                #[env(rename = "renamed")]
+                a: String,
+                #[env(var = "EXACT")]
+                b: String,
+                #[env(nested)]
+                c: Nested,
+            }
+        });
+
+        let vars: Vec<&str> = fields[..3].iter().map(|f| value(f).var.as_str()).collect();
+        assert_eq!(vars, ["App_DB_URL", "App_RENAMED", "EXACT"]);
+        assert!(matches!(fields[3].kind, FieldKind::Nested { .. }));
     }
 
     #[test]

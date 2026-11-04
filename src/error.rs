@@ -1,6 +1,7 @@
+use std::error::Error as StdError;
 use std::fmt::Display;
 
-pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
+pub type BoxError = Box<dyn StdError + Send + Sync + 'static>;
 
 #[derive(Debug)]
 pub struct FromEnvErrors(pub(crate) Vec<FromEnvError>);
@@ -51,5 +52,13 @@ impl Display for FromEnvError {
     }
 }
 
-impl std::error::Error for FromEnvErrors {}
-impl std::error::Error for FromEnvError {}
+impl StdError for FromEnvErrors {}
+
+impl StdError for FromEnvError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            FromEnvError::MissingVar { .. } => None,
+            FromEnvError::ParseError { source, .. } => Some(source.as_ref()),
+        }
+    }
+}
