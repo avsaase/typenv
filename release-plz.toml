@@ -1,6 +1,10 @@
 # Users depend on `typenv`, so it gets the changelog and GitHub releases. Both crates always share
 # a version, since `typenv` pins `typenv-derive` exactly.
 
+[workspace]
+# Only publish when a release PR is merged, not on every push with an unpublished version.
+release_always = false
+
 [[package]]
 name = "typenv"
 version_group = "typenv"

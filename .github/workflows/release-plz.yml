@@ -5,14 +5,13 @@ on:
     branches: [master]
 
 jobs:
-  # Publishes to crates.io and creates the git tag and GitHub release for every package whose
-  # version in Cargo.toml is not published yet, i.e. after the release PR is merged.
+  # Publishes to crates.io and creates the git tag and GitHub release.
   release:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'avsaase' }}
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v5
@@ -20,11 +19,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/create-github-app-token@v3.3.0
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: release-plz/action@v0.5.148
         with:
           command: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   # Opens or updates a pull request that bumps versions and updates the changelog.
   release-pr:
@@ -32,8 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'avsaase' }}
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     concurrency:
       group: release-plz-${{ github.ref }}
       cancel-in-progress: false
@@ -43,8 +46,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/create-github-app-token@v3.3.0
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: release-plz/action@v0.5.148
         with:
           command: release-pr
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
