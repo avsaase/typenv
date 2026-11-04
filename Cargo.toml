@@ -14,7 +14,7 @@ resolver = "3"
 members = ["derive"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
 repository = "https://github.com/avsaase/typenv"
 license = "MIT OR Apache-2.0"
