@@ -218,3 +218,150 @@ fn field_type_without_from_str_is_fine_with_parser() {
         assert_eq!(Config::from_env().unwrap().parser_no_from_str.0, "ok");
     });
 }
+
+#[cfg(feature = "serde")]
+mod deserialize {
+    use serde::Deserialize;
+    use typenv::FromEnv;
+
+    #[derive(Deserialize, Debug, PartialEq)]
+    #[serde(rename_all = "lowercase")]
+    enum LogLevel {
+        Debug,
+        Info,
+        Warn,
+    }
+
+    #[test]
+    fn enum_with_rename_all() {
+        #[derive(FromEnv)]
+        struct Config {
+            #[env(parser = typenv::parser::deserialize)]
+            de_level: LogLevel,
+        }
+
+        temp_env::with_var("DE_LEVEL", Some("warn"), || {
+            assert_eq!(Config::from_env().unwrap().de_level, LogLevel::Warn);
+        });
+    }
+
+    #[test]
+    fn optional_field_and_default() {
+        #[derive(FromEnv)]
+        struct Config {
+            #[env(parser = typenv::parser::deserialize)]
+            de_opt_level: Option<LogLevel>,
+            #[env(parser = typenv::parser::deserialize, default = "info")]
+            de_default_level: LogLevel,
+        }
+
+        temp_env::with_vars(
+            [("DE_OPT_LEVEL", Some("debug")), ("DE_DEFAULT_LEVEL", None)],
+            || {
+                let config = Config::from_env().unwrap();
+                assert_eq!(config.de_opt_level, Some(LogLevel::Debug));
+                assert_eq!(config.de_default_level, LogLevel::Info);
+            },
+        );
+    }
+
+    #[test]
+    fn unknown_variant_is_reported() {
+        #[derive(FromEnv, Debug)]
+        struct Config {
+            #[allow(dead_code)]
+            #[env(parser = typenv::parser::deserialize)]
+            de_bad_level: LogLevel,
+        }
+
+        temp_env::with_var("DE_BAD_LEVEL", Some("trace"), || {
+            assert_eq!(
+                Config::from_env().unwrap_err().to_string(),
+                "Configuration errors:\n  \
+                 - `de_bad_level`: Failed to parse environment variable `DE_BAD_LEVEL=\"trace\"`: \
+                 unknown variant `trace`, expected one of `debug`, `info`, `warn`\n"
+            );
+        });
+    }
+
+    #[test]
+    fn primitives_are_parsed() {
+        #[derive(Deserialize, Debug, PartialEq)]
+        struct Port(u16);
+
+        #[derive(FromEnv)]
+        struct Config {
+            #[env(parser = typenv::parser::deserialize)]
+            de_port: u16,
+            #[env(parser = typenv::parser::deserialize)]
+            de_enabled: bool,
+            #[env(parser = typenv::parser::deserialize)]
+            de_ratio: f64,
+            #[env(parser = typenv::parser::deserialize)]
+            de_newtype: Port,
+        }
+
+        temp_env::with_vars(
+            [
+                ("DE_PORT", Some("8080")),
+                ("DE_ENABLED", Some("true")),
+                ("DE_RATIO", Some("0.5")),
+                ("DE_NEWTYPE", Some("443")),
+            ],
+            || {
+                let config = Config::from_env().unwrap();
+                assert_eq!(config.de_port, 8080);
+                assert!(config.de_enabled);
+                assert_eq!(config.de_ratio, 0.5);
+                assert_eq!(config.de_newtype, Port(443));
+            },
+        );
+    }
+
+    #[test]
+    fn invalid_primitive_is_reported() {
+        #[derive(FromEnv, Debug)]
+        struct Config {
+            #[allow(dead_code)]
+            #[env(parser = typenv::parser::deserialize)]
+            de_bad_port: u16,
+            #[allow(dead_code)]
+            #[env(parser = typenv::parser::deserialize)]
+            de_bad_bool: bool,
+        }
+
+        temp_env::with_vars(
+            [("DE_BAD_PORT", Some("http")), ("DE_BAD_BOOL", Some("yes"))],
+            || {
+                assert_eq!(
+                    Config::from_env().unwrap_err().to_string(),
+                    "Configuration errors:\n  \
+                     - `de_bad_port`: Failed to parse environment variable `DE_BAD_PORT=\"http\"`: \
+                     invalid digit found in string\n  \
+                     - `de_bad_bool`: Failed to parse environment variable `DE_BAD_BOOL=\"yes\"`: \
+                     provided string was not `true` or `false`\n"
+                );
+            },
+        );
+    }
+
+    #[test]
+    fn structured_values_are_rejected() {
+        // Use `parser::json` for these.
+        #[derive(FromEnv, Debug)]
+        struct Config {
+            #[allow(dead_code)]
+            #[env(parser = typenv::parser::deserialize)]
+            de_list: Vec<u16>,
+        }
+
+        temp_env::with_var("DE_LIST", Some("80,443"), || {
+            assert_eq!(
+                Config::from_env().unwrap_err().to_string(),
+                "Configuration errors:\n  \
+                 - `de_list`: Failed to parse environment variable `DE_LIST=\"80,443\"`: \
+                 invalid type: string \"80,443\", expected a sequence\n"
+            );
+        });
+    }
+}

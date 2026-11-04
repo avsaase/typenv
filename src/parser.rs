@@ -6,6 +6,9 @@ use std::str::FromStr;
 
 use crate::BoxError;
 
+#[cfg(feature = "serde")]
+mod de;
+
 /// The result of a [`Parser`]. Any error that is `Send + Sync + 'static` can be returned.
 pub type ParseResult<T> = Result<T, BoxError>;
 
@@ -45,6 +48,19 @@ where
     <T as TryFrom<String>>::Error: Into<BoxError>,
 {
     s.to_owned().try_into().map_err(Into::into)
+}
+
+/// Deserializes the value with serde. Requires the `serde` feature.
+///
+/// Useful for types that implement `Deserialize` but not `FromStr`, such as enums with
+/// `#[serde(rename_all = "...")]` or newtypes. Numbers, booleans and `char` are parsed from the
+/// string first; other types receive the string as is. Use `json` for structured values.
+#[cfg(feature = "serde")]
+pub fn deserialize<T>(s: &str) -> ParseResult<T>
+where
+    T: serde::de::DeserializeOwned,
+{
+    T::deserialize(de::ValueDeserializer(s)).map_err(Into::into)
 }
 
 /// Deserializes the value as JSON. Requires the `json` feature.

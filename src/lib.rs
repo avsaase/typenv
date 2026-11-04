@@ -9,7 +9,8 @@
 //! - Stringly and typed defaults.
 //! - Parsing using `FromStr` by default, with support for custom parser functions, closures or
 //!   type.
-//! - Built-in parsers for `From<String>`, `TryFrom<String>` and JSON (behind the `json` feature).
+//! - Built-in parsers for `From<String>`, `TryFrom<String>`, serde (`serde` feature) and JSON
+//!   (`json` feature).
 //! - Structs can be nested with the environment variables that each struct will read clear from the
 //!   struct definition.
 //! - All errors reported at once instead of failing at the first.
