@@ -1,0 +1,14 @@
+# Users depend on `typenv`, so it gets the changelog and GitHub releases. Both crates always share
+# a version, since `typenv` pins `typenv-derive` exactly.
+
+[[package]]
+name = "typenv"
+version_group = "typenv"
+# Commits that only touch the derive crate are still user-facing changes.
+changelog_include = ["typenv-derive"]
+
+[[package]]
+name = "typenv-derive"
+version_group = "typenv"
+changelog_update = false
+git_release_enable = false

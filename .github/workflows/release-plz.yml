@@ -1,0 +1,50 @@
+name: Release-plz
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  # Publishes to crates.io and creates the git tag and GitHub release for every package whose
+  # version in Cargo.toml is not published yet, i.e. after the release PR is merged.
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'avsaase' }}
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: release-plz/action@v0.5.148
+        with:
+          command: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Opens or updates a pull request that bumps versions and updates the changelog.
+  release-pr:
+    name: Release PR
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'avsaase' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: release-plz-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: release-plz/action@v0.5.148
+        with:
+          command: release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
