@@ -25,12 +25,14 @@ Read environment variables into type-safe structs.
 
 - Derive `FromEnv` and load a struct with `Config::from_env()`.
 - Variable names are the uppercased field names, with an optional struct-level `prefix`.
-- Support for optional values with an explicit error if parsing failes instead of silently
-falling back to `None`.
+- Support for optional values with an explicit error if parsing fails instead of silently
+  falling back to `None`.
 - Stringly and typed defaults.
-- Parsing using `FromStr` by default, with support for custom parser functions, closures or type.
+- Parsing using `FromStr` by default, with support for custom parser functions, closures or
+  type.
 - Built-in parsers for `From<String>`, `TryFrom<String>` and JSON (behind the `json` feature).
-- Structs can be nested with the environment variables that each struct will read clear from the struct definition.
+- Structs can be nested with the environment variables that each struct will read clear from the
+  struct definition.
 - All errors reported at once instead of failing at the first.
 - Errors include the field path, the variable name and the rejected value.
 
