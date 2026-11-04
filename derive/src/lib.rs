@@ -108,6 +108,18 @@ mod model;
 /// Loading does not stop at the first problem: `from_env` returns a `FromEnvErrors` listing every
 /// missing or invalid variable. Errors from nested structs are reported with the field path, such
 /// as `database.url`.
+///
+/// # Documenting variables
+///
+/// The derive also generates an `ENV_VARS` const that lists every variable the struct reads,
+/// including those of nested structs, which name the field they are loaded into.
+///
+/// ```text
+/// APP_PORT
+/// APP_LOG_LEVEL (optional)
+/// DB_URL, from Database::url
+/// DB_POOL_SIZE (default: 5), from Database::pool_size
+/// ```
 #[proc_macro_derive(FromEnv, attributes(env))]
 pub fn derive_from_env(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);

@@ -133,3 +133,33 @@ impl ErrorCollector {
         FromEnvErrors(self.0)
     }
 }
+
+/// The total length of `parts`, used as the array length for [`concat`].
+pub const fn concat_len(parts: &[&str]) -> usize {
+    let mut len = 0;
+    let mut i = 0;
+    while i < parts.len() {
+        len += parts[i].len();
+        i += 1;
+    }
+    len
+}
+
+/// Concatenates `parts` at compile time. `N` must be [`concat_len`] of `parts`.
+pub const fn concat<const N: usize>(parts: &[&str]) -> [u8; N] {
+    let mut out = [0; N];
+    let mut pos = 0;
+    let mut i = 0;
+    while i < parts.len() {
+        let bytes = parts[i].as_bytes();
+        let mut j = 0;
+        while j < bytes.len() {
+            out[pos] = bytes[j];
+            pos += 1;
+            j += 1;
+        }
+        i += 1;
+    }
+    assert!(pos == N, "`N` must be the total length of `parts`");
+    out
+}

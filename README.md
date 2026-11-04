@@ -36,6 +36,7 @@ Read environment variables into type-safe structs.
   struct definition.
 - All errors reported at once instead of failing at the first.
 - Errors include the field path, the variable name and the rejected value.
+- A generated `ENV_VARS` const that lists every variable a struct reads.
 
 ### Example
 
