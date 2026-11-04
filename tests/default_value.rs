@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use from_env::{FromEnv, ParseResult};
+use from_env::{FromEnv, parser::ParseResult};
 
 #[test]
 fn used_when_absent() {

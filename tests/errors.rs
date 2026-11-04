@@ -123,7 +123,7 @@ fn list_renders_the_full_cause_chain() {
         }
     }
 
-    fn port(s: &str) -> from_env::ParseResult<u16> {
+    fn port(s: &str) -> from_env::parser::ParseResult<u16> {
         s.parse().map_err(|e| Outer(e).into())
     }
 

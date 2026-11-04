@@ -1,6 +1,6 @@
 use from_env::FromEnv;
 
-fn parse(s: &str) -> from_env::ParseResult<String> {
+fn parse(s: &str) -> from_env::parser::ParseResult<String> {
     Ok(s.to_owned())
 }
 

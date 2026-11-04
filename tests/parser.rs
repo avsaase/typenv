@@ -1,6 +1,9 @@
 //! `#[env(parser = ...)]`.
 
-use from_env::{FromEnv, ParseResult, Parser};
+use from_env::{
+    FromEnv,
+    parser::{ParseResult, Parser},
+};
 
 fn comma_list(s: &str) -> ParseResult<Vec<String>> {
     Ok(s.split(',').map(|item| item.trim().to_owned()).collect())

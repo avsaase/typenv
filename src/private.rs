@@ -1,4 +1,4 @@
-use crate::{FromEnvError, FromEnvErrors, Parser};
+use crate::{FromEnvError, FromEnvErrors, parser::Parser};
 
 pub fn required<T>(path: &str, var: &str, parser: &impl Parser<T>) -> Result<T, FromEnvError> {
     match read(path, var)? {
