@@ -1,16 +1,28 @@
 [package]
 name = "typenv"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+description = "Load environment variables into a type-safe struct with a derive macro"
+documentation = "https://docs.rs/typenv"
+repository.workspace = true
+license.workspace = true
+keywords = ["config", "configuration", "derive", "env", "environment"]
+categories = ["config"]
 
 [workspace]
 resolver = "3"
 members = ["derive"]
 
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+repository = "https://github.com/avsaase/typenv"
+license = "MIT OR Apache-2.0"
+
 [dependencies]
-typenv-derive = { path = "derive", version = "=0.1.0" }
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
+typenv-derive = { path = "derive", version = "=0.1.0" }
 
 [dev-dependencies]
 temp-env = "0.3.6"

@@ -1,7 +1,13 @@
 [package]
 name = "typenv-derive"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+description = "Derive macro for typenv. Use the typenv crate instead of depending on this directly."
+documentation = "https://docs.rs/typenv-derive"
+repository.workspace = true
+license.workspace = true
+keywords = ["config", "derive", "env", "environment"]
+categories = ["config", "development-tools::procedural-macro-helpers"]
 
 [lib]
 proc-macro = true
@@ -13,6 +19,6 @@ quote = "1.0"
 syn = { version = "2.0", features = ["derive", "parsing"] }
 
 [dev-dependencies]
+temp-env = "0.3.6"
 # For the doc examples. Cargo allows this cycle for dev-dependencies.
 typenv = { path = ".." }
-temp-env = "0.3.6"
