@@ -22,7 +22,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
-typenv-derive = { path = "derive", version = "=0.1.0" }
+typenv-derive = { path = "derive", version = "=0.0.1" }
 
 [dev-dependencies]
 secrecy = "0.10.3"
