@@ -1,6 +1,6 @@
 //! Required, optional and defaulted fields.
 
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[test]
 fn required_field_is_parsed() {

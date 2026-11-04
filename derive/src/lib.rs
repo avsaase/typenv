@@ -8,7 +8,7 @@ mod model;
 /// Derives `FromEnv`, loading a struct from environment variables.
 ///
 /// ```
-/// use from_env::FromEnv;
+/// use typenv::FromEnv;
 ///
 /// #[derive(FromEnv)]
 /// #[env(prefix = "APP_")]
@@ -46,7 +46,7 @@ mod model;
 /// # Field types
 ///
 /// Values are parsed with [`FromStr`](std::str::FromStr) unless a `parser` is given. The parse
-/// error can be any type that converts into `from_env::BoxError`, including `String` and any
+/// error can be any type that converts into `typenv::BoxError`, including `String` and any
 /// `std::error::Error`.
 ///
 /// A field of type `Option<T>` is optional: an unset variable gives `None`, while a value that
@@ -65,8 +65,8 @@ mod model;
 /// - `#[env(default_value = expr)]`: if the variable is unset, use this value. It is type checked
 ///   at compile time, only evaluated when needed, and not passed through the parser. Cannot be
 ///   combined with `default`.
-/// - `#[env(parser = expr)]`: parse the value with this `from_env::parser::Parser`, such as a
-///   function, a closure, or one of the functions in `from_env::parser`. For `Option<T>` fields it
+/// - `#[env(parser = expr)]`: parse the value with this `typenv::parser::Parser`, such as a
+///   function, a closure, or one of the functions in `typenv::parser`. For `Option<T>` fields it
 ///   parses the `T`.
 /// - `#[env(nested)]`: load the field from its own `FromEnv` implementation. Cannot be combined
 ///   with other attributes or used on `Option` fields.
@@ -75,7 +75,7 @@ mod model;
 ///
 /// ```
 /// use std::time::Duration;
-/// use from_env::{FromEnv, parser::ParseResult};
+/// use typenv::{FromEnv, parser::ParseResult};
 ///
 /// fn seconds(s: &str) -> ParseResult<Duration> {
 ///     Ok(Duration::from_secs(s.parse()?))

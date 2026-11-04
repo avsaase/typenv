@@ -1,9 +1,9 @@
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[derive(FromEnv)]
 struct Inner {}
 
-fn parse(_: &str) -> from_env::ParseResult<Inner> {
+fn parse(_: &str) -> typenv::ParseResult<Inner> {
     Ok(Inner {})
 }
 

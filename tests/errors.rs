@@ -1,6 +1,6 @@
 //! Error accumulation and reporting.
 
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[test]
 fn all_errors_are_reported_in_field_order() {
@@ -37,8 +37,8 @@ fn all_errors_are_reported_in_field_order() {
 #[test]
 fn errors_implement_std_error() {
     fn assert_error<E: std::error::Error + Send + Sync + 'static>() {}
-    assert_error::<from_env::FromEnvErrors>();
-    assert_error::<from_env::FromEnvError>();
+    assert_error::<typenv::FromEnvErrors>();
+    assert_error::<typenv::FromEnvError>();
 }
 
 #[cfg(unix)]
@@ -72,7 +72,7 @@ fn non_unicode_value_is_a_parse_error() {
 fn single_error_leaves_cause_to_source() {
     use std::error::Error;
 
-    let error = from_env::FromEnvError::ParseError {
+    let error = typenv::FromEnvError::ParseError {
         path: "port".into(),
         var: "PORT".into(),
         value: "abc".into(),
@@ -123,7 +123,7 @@ fn list_renders_the_full_cause_chain() {
         }
     }
 
-    fn port(s: &str) -> from_env::parser::ParseResult<u16> {
+    fn port(s: &str) -> typenv::parser::ParseResult<u16> {
         s.parse().map_err(|e| Outer(e).into())
     }
 

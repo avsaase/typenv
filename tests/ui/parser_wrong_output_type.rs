@@ -1,6 +1,6 @@
-use from_env::FromEnv;
+use typenv::FromEnv;
 
-fn parse(s: &str) -> from_env::parser::ParseResult<String> {
+fn parse(s: &str) -> typenv::parser::ParseResult<String> {
     Ok(s.to_owned())
 }
 

@@ -9,7 +9,7 @@ error[E0271]: expected `parse` to return `Result<u32, Box<dyn Error + Send + Syn
    = note: expected enum `Result<u32, Box<(dyn std::error::Error + Send + Sync + 'static)>>`
               found enum `Result<String, Box<(dyn std::error::Error + Send + Sync + 'static)>>`
    = note: required for `for<'a> fn(&'a str) -> Result<String, Box<(dyn std::error::Error + Send + Sync + 'static)>> {parse}` to implement `Parser<u32>`
-note: required by a bound in `from_env::__private::required`
+note: required by a bound in `typenv::__private::required`
   --> src/private.rs
    |
    | pub fn required<T>(path: &str, var: &str, parser: &impl Parser<T>) -> Result<T, FromEnvError> {

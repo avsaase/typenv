@@ -1,6 +1,6 @@
 //! Controlling which environment variable a field reads.
 
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[test]
 fn field_name_is_uppercased() {

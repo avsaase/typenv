@@ -1,4 +1,4 @@
-pub use from_env_derive::FromEnv;
+pub use typenv_derive::FromEnv;
 
 #[doc(hidden)]
 #[path = "private.rs"]

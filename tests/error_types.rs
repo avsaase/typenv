@@ -2,7 +2,7 @@
 
 use std::{convert::Infallible, str::FromStr};
 
-use from_env::{BoxError, FromEnv};
+use typenv::{BoxError, FromEnv};
 
 /// A `FromStr` type whose error is `E`, built from a fixed message.
 macro_rules! level_with_error {
@@ -120,7 +120,7 @@ fn try_into_with_string_error() {
 
     #[derive(FromEnv, Debug)]
     struct Config {
-        #[env(parser = from_env::parser::try_into)]
+        #[env(parser = typenv::parser::try_into)]
         et_non_empty: NonEmpty,
     }
 

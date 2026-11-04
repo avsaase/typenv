@@ -1,6 +1,6 @@
 //! `#[env(prefix = "...")]` on structs.
 
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[test]
 fn prefix_is_prepended_to_field_names() {

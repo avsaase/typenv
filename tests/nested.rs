@@ -1,6 +1,6 @@
 //! `#[env(nested)]` fields.
 
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[derive(FromEnv, Debug)]
 struct Database {

@@ -1,14 +1,14 @@
 //! The generated inherent `from_env`, callable without importing the trait.
 
-// Deliberately no `use from_env::FromEnv;` in this file.
+// Deliberately no `use typenv::FromEnv;` in this file.
 
 mod config {
-    #[derive(from_env::FromEnv)]
+    #[derive(typenv::FromEnv)]
     pub struct Public {
         pub inherent_public: u16,
     }
 
-    #[derive(from_env::FromEnv)]
+    #[derive(typenv::FromEnv)]
     pub(crate) struct CrateVisible {
         pub inherent_crate: u16,
     }
@@ -30,7 +30,7 @@ fn uses_struct_visibility() {
 
 #[test]
 fn generic_struct() {
-    #[derive(from_env::FromEnv)]
+    #[derive(typenv::FromEnv)]
     struct Config<T>
     where
         T: std::str::FromStr,
@@ -46,7 +46,7 @@ fn generic_struct() {
 
 #[test]
 fn same_result_as_trait() {
-    #[derive(from_env::FromEnv, Debug)]
+    #[derive(typenv::FromEnv, Debug)]
     struct Config {
         #[allow(dead_code)]
         inherent_same: u16,
@@ -55,7 +55,7 @@ fn same_result_as_trait() {
     temp_env::with_var("INHERENT_SAME", Some("x"), || {
         assert_eq!(
             Config::from_env().unwrap_err().to_string(),
-            <Config as from_env::FromEnv>::from_env()
+            <Config as typenv::FromEnv>::from_env()
                 .unwrap_err()
                 .to_string()
         );
@@ -64,11 +64,11 @@ fn same_result_as_trait() {
 
 #[test]
 fn trait_is_still_implemented() {
-    fn load<T: from_env::FromEnv>() -> Result<T, from_env::FromEnvErrors> {
+    fn load<T: typenv::FromEnv>() -> Result<T, typenv::FromEnvErrors> {
         T::from_env()
     }
 
-    #[derive(from_env::FromEnv)]
+    #[derive(typenv::FromEnv)]
     struct Config {
         inherent_trait: u16,
     }

@@ -1,6 +1,6 @@
 //! `#[env(parser = ...)]`.
 
-use from_env::{
+use typenv::{
     FromEnv,
     parser::{ParseResult, Parser},
 };
@@ -69,7 +69,7 @@ fn builtin_into() {
 
     #[derive(FromEnv)]
     struct Config {
-        #[env(parser = from_env::parser::into)]
+        #[env(parser = typenv::parser::into)]
         parser_name: Name,
     }
 
@@ -97,7 +97,7 @@ fn builtin_try_into() {
 
     #[derive(FromEnv, Debug)]
     struct Config {
-        #[env(parser = from_env::parser::try_into)]
+        #[env(parser = typenv::parser::try_into)]
         parser_non_empty: NonEmpty,
     }
 
@@ -123,7 +123,7 @@ fn builtin_try_into() {
 fn builtin_json() {
     #[derive(FromEnv, Debug)]
     struct Config {
-        #[env(parser = from_env::parser::json)]
+        #[env(parser = typenv::parser::json)]
         parser_ports: Vec<u16>,
     }
 

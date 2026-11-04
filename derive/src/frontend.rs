@@ -54,7 +54,7 @@ struct FieldReceiver {
     #[darling(default, with = darling::util::parse_expr::preserve_str_literal, map = Some)]
     default_value: Option<Expr>,
     rename: Option<SpannedValue<String>>,
-    /// Any expression implementing `from_env::Parser<T>`, e.g. a function path or closure.
+    /// Any expression implementing `typenv::parser::Parser<T>`, e.g. a function path or closure.
     parser: Option<Expr>,
     nested: Flag,
 }

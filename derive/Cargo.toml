@@ -1,5 +1,5 @@
 [package]
-name = "from-env-derive"
+name = "typenv-derive"
 version = "0.1.0"
 edition = "2024"
 
@@ -14,5 +14,5 @@ syn = { version = "2.0", features = ["derive", "parsing"] }
 
 [dev-dependencies]
 # For the doc examples. Cargo allows this cycle for dev-dependencies.
-from-env = { path = ".." }
+typenv = { path = ".." }
 temp-env = "0.3.6"

@@ -1,4 +1,4 @@
-use from_env::FromEnv;
+use typenv::FromEnv;
 
 #[test]
 fn basic() {
