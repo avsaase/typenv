@@ -7,8 +7,8 @@
 //! - Support for optional values with an explicit error if parsing fails instead of silently
 //!   falling back to `None`.
 //! - Stringly and typed defaults.
-//! - Parsing using `FromStr` by default, with support for custom parser functions, closures or
-//!   type.
+//! - Parsing using `FromStr`, `TryFrom<String>` or `From<String>` by default, with support for
+//!   custom parser functions, closures or type.
 //! - Built-in parsers for `From<String>`, `TryFrom<String>`, serde (`serde` feature) and JSON
 //!   (`json` feature).
 //! - Structs can be nested with the environment variables that each struct will read clear from the
@@ -35,8 +35,7 @@
 //! #[derive(Debug, FromEnv)]
 //! #[env(prefix = "DB_")]
 //! struct Database {
-//!     url: String, // DB_URL
-//!     #[env(parser = typenv::parser::into)]
+//!     url: String,          // DB_URL
 //!     password: SecretString, // DB_PASSWORD, redacted in `Debug` output
 //!     #[env(default_value = 5)]
 //!     pool_size: u32, // DB_POOL_SIZE, defaults to 5

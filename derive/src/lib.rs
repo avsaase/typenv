@@ -45,9 +45,10 @@ mod model;
 ///
 /// # Field types
 ///
-/// Values are parsed with [`FromStr`](std::str::FromStr) unless a `parser` is given. The parse
-/// error can be any type that converts into `typenv::BoxError`, including `String` and any
-/// `std::error::Error`.
+/// Unless a `parser` is given, values are parsed with [`FromStr`](std::str::FromStr), or with
+/// `TryFrom<String>` for types that do not implement `FromStr`. That includes every type that
+/// implements `From<String>`. If a type implements both, `FromStr` is used. The parse error can be
+/// any type that converts into `typenv::BoxError`, including `String` and any `std::error::Error`.
 ///
 /// A field of type `Option<T>` is optional: an unset variable gives `None`, while a value that
 /// fails to parse is still an error.

@@ -1,6 +1,7 @@
 //! Parsers that turn an environment variable's value into a field's type.
 //!
-//! Select one with `#[env(parser = ...)]`; fields without one use [`from_str`].
+//! Select one with `#[env(parser = ...)]`. Fields without one use [`from_str`], or [`try_into`] for
+//! types that only implement `TryFrom<String>` or `From<String>`.
 
 use std::str::FromStr;
 
@@ -21,7 +22,7 @@ pub trait Parser<T> {
     fn parse(&self, s: &str) -> ParseResult<T>;
 }
 
-/// Parses with [`FromStr`]. This is the default parser.
+/// Parses with [`FromStr`]. The default parser for types that implement `FromStr`.
 ///
 /// `T::Err` can be any type convertible into [`BoxError`]: any `Error + Send + Sync + 'static`
 /// type, as well as `String` and `&str`.

@@ -1,0 +1,19 @@
+error[E0277]: `T` cannot be parsed from an environment variable
+ --> tests/ui/generic_field_without_bounds.rs:5:12
+  |
+5 |     field: T,
+  |            ^ no default parser for `T`
+  |
+  = note: implement `FromStr`, `TryFrom<String>` or `From<String>` for `T`, or set a parser with `#[env(parser = ...)]`
+note: required by a bound in `typenv::__private::ViaFallback::__typenv_default_parser`
+ --> src/private.rs
+  |
+  |     fn __typenv_default_parser(&self) -> fn(&str) -> ParseResult<T>
+  |        ----------------------- required by a bound in this associated function
+  |     where
+  |         T: NoDefaultParser;
+  |            ^^^^^^^^^^^^^^^ required by this bound in `ViaFallback::__typenv_default_parser`
+help: consider restricting type parameter `T` with trait `NoDefaultParser`
+  |
+4 | struct Config<T: typenv::__private::NoDefaultParser> {
+  |                ++++++++++++++++++++++++++++++++++++

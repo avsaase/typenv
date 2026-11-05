@@ -97,7 +97,16 @@ fn value_call(path: &str, span: Span, value: &ValueField) -> TokenStream {
 
     let parser = match parser {
         Some(parser) => quote_spanned! {parser.span()=> &(#parser) },
-        None => quote_spanned! {span=> &::typenv::parser::from_str::<#ty> },
+        // `FromStr` if implemented, otherwise `TryFrom<String>` (which includes `From<String>`),
+        // otherwise a readable compile error. See `typenv::__private::Wrap`.
+        None => quote_spanned! {span=>
+            &{
+                // Only one of the traits applies to a given type.
+                #[allow(unused_imports)]
+                use ::typenv::__private::{ViaFallback as _, ViaFromStr as _, ViaTryFrom as _};
+                (&&&::typenv::__private::Wrap::<#ty>::new()).__typenv_default_parser()
+            }
+        },
     };
 
     // The explicit `::<#ty>` lets generic parsers such as `parser::json` infer
