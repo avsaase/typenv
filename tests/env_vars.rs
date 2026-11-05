@@ -158,31 +158,3 @@ fn usable_in_const_context_and_through_the_trait() {
     assert_eq!(DOCS, "CONST_VALUE, from Inner::const_value\n");
     assert_eq!(docs::<Config>(), DOCS);
 }
-
-#[test]
-fn manual_impl_only_needs_env_vars() {
-    struct Manual;
-
-    impl FromEnv for Manual {
-        const ENV_VARS: &'static str = "MANUAL_VALUE, from Manual\n";
-
-        fn from_env() -> Result<Self, typenv::FromEnvErrors> {
-            Ok(Manual)
-        }
-    }
-
-    #[derive(FromEnv)]
-    #[allow(dead_code)]
-    struct Config {
-        own: u8,
-        #[env(nested)]
-        manual: Manual,
-    }
-
-    // Without `__NESTED_ENV_VARS`, the trait's default uses `ENV_VARS` as written.
-    assert_eq!(
-        Config::ENV_VARS,
-        "OWN\n\
-         MANUAL_VALUE, from Manual\n"
-    );
-}

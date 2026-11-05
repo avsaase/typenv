@@ -8,6 +8,13 @@ use crate::BoxError;
 use crate::parser::{self, ParseResult, Parser};
 use crate::{FromEnvError, FromEnvErrors};
 
+#[diagnostic::on_unimplemented(
+    message = "`FromEnv` can only be implemented with `#[derive(FromEnv)]`",
+    label = "`FromEnv` is implemented by hand for `{Self}`",
+    note = "replace the manual `impl FromEnv for {Self}` with `#[derive(FromEnv)]` on the struct"
+)]
+pub trait Sealed {}
+
 /// Selects the default parser for `T` with autoref-based specialization: the generated code calls
 /// `(&&&Wrap::<T>::new()).__typenv_default_parser()`, and method resolution dereferences the
 /// receiver until an impl applies:

@@ -38,6 +38,8 @@ pub fn expand(container: &Container) -> TokenStream {
     };
 
     quote! {
+        impl #impl_generics ::typenv::__private::Sealed for #ident #ty_generics #where_clause {}
+
         impl #impl_generics ::typenv::FromEnv for #ident #ty_generics #where_clause {
             const ENV_VARS: &'static str = #env_vars;
             const __NESTED_ENV_VARS: &'static str = #nested_env_vars;
