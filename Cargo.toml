@@ -17,7 +17,7 @@ resolver = "3"
 members = ["derive"]
 
 [workspace.package]
-version = "0.0.2"
+version = "0.0.3"
 edition = "2024"
 repository = "https://github.com/avsaase/typenv"
 license = "MIT OR Apache-2.0"
@@ -25,7 +25,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
-typenv-derive = { path = "derive", version = "=0.0.2" }
+typenv-derive = { path = "derive", version = "=0.0.3" }
 
 [dev-dependencies]
 secrecy = "0.10.3"
