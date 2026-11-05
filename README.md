@@ -47,8 +47,8 @@ use typenv::FromEnv;
 #[derive(FromEnv)]
 #[env(prefix = "APP_")]
 struct Config {
-    port: u16,                 // APP_PORT
-    log_level: Option<String>, // APP_LOG_LEVEL, may be unset
+    port: u16,                  // APP_PORT
+    log_level: Option<String>,  // APP_LOG_LEVEL, may be unset
     #[env(nested)]
     database: Database,
 }
@@ -56,10 +56,10 @@ struct Config {
 #[derive(Debug, FromEnv)]
 #[env(prefix = "DB_")]
 struct Database {
-    url: String,          // DB_URL
-    password: SecretString, // DB_PASSWORD, redacted in `Debug` output
+    url: String,                // DB_URL
+    password: SecretString,     // DB_PASSWORD, redacted in `Debug` output
     #[env(default_value = 5)]
-    pool_size: u32, // DB_POOL_SIZE, defaults to 5
+    pool_size: u32,             // DB_POOL_SIZE, defaults to 5
 }
 
 std::env::set_var("APP_PORT", "8080");
