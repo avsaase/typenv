@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4](https://github.com/avsaase/typenv/compare/typenv-v0.0.3...typenv-v0.0.4) - 2026-11-05
+
+### Other
+
+- fix docs for 0.1.0 release
+
 ## [0.0.3](https://github.com/avsaase/typenv/compare/typenv-v0.0.2...typenv-v0.0.3) - 2026-11-05
 
 ### Added
