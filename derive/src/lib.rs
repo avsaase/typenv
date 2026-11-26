@@ -53,6 +53,11 @@ mod model;
 /// A field of type `Option<T>` is optional: an unset variable gives `None`, while a value that
 /// fails to parse is still an error.
 ///
+/// An optional nested field, such as `#[env(nested)] database: Option<Database>`, is optional as a
+/// group. If none of the variables that `Database` reads are set, the field is `None`. If any of
+/// them is set, the nested struct is loaded normally, so missing required variables and invalid
+/// values are errors instead of silently producing `None`.
+///
 /// # Struct attributes
 ///
 /// - `#[env(prefix = "APP_")]`: prepended to the variable names of this struct's fields, except
@@ -69,8 +74,9 @@ mod model;
 /// - `#[env(parser = expr)]`: parse the value with this `typenv::parser::Parser`, such as a
 ///   function, a closure, or one of the functions in `typenv::parser`. For `Option<T>` fields it
 ///   parses the `T`.
-/// - `#[env(nested)]`: load the field from its own `FromEnv` implementation. Cannot be combined
-///   with other attributes or used on `Option` fields.
+/// - `#[env(nested)]`: load the field from its own `FromEnv` implementation. An `Option` field is
+///   loaded only when one of the nested struct's variables is set, as described above. Cannot be
+///   combined with other attributes.
 ///
 /// `default` and `default_value` cannot be used on `Option` fields.
 ///

@@ -12,7 +12,8 @@
 //! - Built-in parsers for `From<String>`, `TryFrom<String>`, serde (`serde` feature) and JSON
 //!   (`json` feature).
 //! - Structs can be nested with the environment variables that each struct will read clear from the
-//!   struct definition.
+//!   struct definition. An `Option` nested struct is optional as a group: it is loaded only when one
+//!   of its variables is set.
 //! - All errors reported at once instead of failing at the first.
 //! - Errors include the field path, the variable name and the rejected value.
 //! - A generated `ENV_VARS` const that lists every variable a struct reads.

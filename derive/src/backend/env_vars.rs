@@ -42,7 +42,7 @@ pub(super) fn env_vars(container: &Container, placement: Placement) -> TokenStre
             }
             // Nested parts are joined into an array whose length must be known without the
             // struct's generic parameters, so a type that uses them is only referenced.
-            FieldKind::Nested { ty } if mentions(ty.to_token_stream(), &generic_idents) => {
+            FieldKind::Nested { ty, .. } if mentions(ty.to_token_stream(), &generic_idents) => {
                 push_text(
                     &mut parts,
                     format!(
@@ -51,7 +51,7 @@ pub(super) fn env_vars(container: &Container, placement: Placement) -> TokenStre
                     ),
                 );
             }
-            FieldKind::Nested { ty } => parts.push(Part::Nested(ty)),
+            FieldKind::Nested { ty, .. } => parts.push(Part::Nested(ty)),
         }
     }
 

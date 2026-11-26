@@ -9,11 +9,17 @@ use crate::parser::{self, ParseResult, Parser};
 use crate::{FromEnvError, FromEnvErrors};
 
 #[diagnostic::on_unimplemented(
-    message = "`FromEnv` can only be implemented with `#[derive(FromEnv)]`",
-    label = "`FromEnv` is implemented by hand for `{Self}`",
-    note = "replace the manual `impl FromEnv for {Self}` with `#[derive(FromEnv)]` on the struct"
+    message = "`{Self}` does not implement `FromEnv`",
+    label = "`FromEnv` can only be implemented with `#[derive(FromEnv)]`",
+    note = "add `#[derive(FromEnv)]` to `{Self}`"
 )]
-pub trait Sealed {}
+pub trait Sealed {
+    /// Whether any environment variable this type reads is set.
+    ///
+    /// Used to decide whether an optional nested group is present. It checks every variable
+    /// recursively, without parsing anything.
+    fn __is_present() -> bool;
+}
 
 /// Selects the default parser for `T` with autoref-based specialization: the generated code calls
 /// `(&&&Wrap::<T>::new()).__typenv_default_parser()`, and method resolution dereferences the
@@ -92,6 +98,20 @@ impl<T> ViaFallback<T> for Wrap<T> {
         T: NoDefaultParser,
     {
         |_| Err("no default parser for this type".into())
+    }
+}
+
+/// Whether the environment variable `var` is set, including when its value is not valid Unicode.
+pub fn is_set(var: &str) -> bool {
+    std::env::var_os(var).is_some()
+}
+
+/// Loads `T` only if one of the variables it reads is set. Otherwise the whole group is absent.
+pub fn optional_nested<T: crate::FromEnv>() -> Result<Option<T>, FromEnvErrors> {
+    if <T as Sealed>::__is_present() {
+        T::from_env().map(Some)
+    } else {
+        Ok(None)
     }
 }
 
@@ -205,20 +225,40 @@ impl ErrorCollector {
     ) -> Option<T> {
         match result {
             Ok(value) => Some(value),
-            Err(FromEnvErrors(errors)) => {
-                self.0.extend(errors.into_iter().map(|mut error| {
-                    match &mut error {
-                        FromEnvError::MissingVar { path, .. }
-                        | FromEnvError::ParseError { path, .. }
-                        | FromEnvError::InvalidDefault { path, .. } => {
-                            *path = format!("{prefix}.{path}");
-                        }
-                    }
-                    error
-                }));
+            Err(errors) => {
+                self.push_nested(prefix, errors);
                 None
             }
         }
+    }
+
+    /// Like [`Self::handle_nested`], for an optional group: an absent group is a success with
+    /// `None`, not an error.
+    pub fn handle_nested_optional<T>(
+        &mut self,
+        prefix: &str,
+        result: Result<Option<T>, FromEnvErrors>,
+    ) -> Option<Option<T>> {
+        match result {
+            Ok(value) => Some(value),
+            Err(errors) => {
+                self.push_nested(prefix, errors);
+                None
+            }
+        }
+    }
+
+    fn push_nested(&mut self, prefix: &str, FromEnvErrors(errors): FromEnvErrors) {
+        self.0.extend(errors.into_iter().map(|mut error| {
+            match &mut error {
+                FromEnvError::MissingVar { path, .. }
+                | FromEnvError::ParseError { path, .. }
+                | FromEnvError::InvalidDefault { path, .. } => {
+                    *path = format!("{prefix}.{path}");
+                }
+            }
+            error
+        }));
     }
 
     pub fn finish(self) -> FromEnvErrors {

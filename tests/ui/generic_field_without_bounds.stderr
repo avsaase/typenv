@@ -8,8 +8,8 @@ error[E0277]: `T` cannot be parsed from an environment variable
 note: required by a bound in `typenv::__private::ViaFallback::__typenv_default_parser`
  --> src/private.rs
   |
+  | pub trait ViaFallback<T> {
   |     fn __typenv_default_parser(&self) -> fn(&str) -> ParseResult<T>
-  |        ----------------------- required by a bound in this associated function
   |     where
   |         T: NoDefaultParser;
   |            ^^^^^^^^^^^^^^^ required by this bound in `ViaFallback::__typenv_default_parser`

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `#[env(nested)]` can now be used on `Option` fields. The nested struct is loaded only when one of
+  its variables is set, so a partially present group is an error instead of `None`.
+
 ## [0.1.0](https://github.com/avsaase/typenv/compare/typenv-v0.0.3...typenv-v0.1.0) - 2026-11-05
 
 ### Other

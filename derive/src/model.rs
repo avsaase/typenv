@@ -25,7 +25,13 @@ pub struct Field {
 )]
 pub enum FieldKind {
     /// `#[env(nested)]`: loaded through the type's own `FromEnv` impl.
-    Nested { ty: Type },
+    Nested {
+        /// The nested type, with any surrounding `Option` removed.
+        ty: Type,
+        /// Whether the field is `Option<T>`: the group is loaded only when one of its variables
+        /// is set.
+        optional: bool,
+    },
     /// Read from a single environment variable.
     Value(ValueField),
 }

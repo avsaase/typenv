@@ -103,20 +103,11 @@ impl FieldReceiver {
             }
         }
 
-        if self.nested.is_present() {
-            if has_var_settings {
-                errors.push(error(
-                    self.nested.span(),
-                    "`nested` cannot be used with other attributes",
-                ));
-            }
-
-            if is_optional {
-                errors.push(error(
-                    self.nested.span(),
-                    "`nested` cannot be used on an optional field",
-                ));
-            }
+        if self.nested.is_present() && has_var_settings {
+            errors.push(error(
+                self.nested.span(),
+                "`nested` cannot be used with other attributes",
+            ));
         }
 
         errors.finish_with(self)
@@ -131,7 +122,11 @@ impl FieldReceiver {
         let span = self.ty.span();
 
         let kind = if self.nested.is_present() {
-            FieldKind::Nested { ty: self.ty }
+            let (ty, optional) = match option_inner(&self.ty) {
+                Some(inner) => (inner.clone(), true),
+                None => (self.ty, false),
+            };
+            FieldKind::Nested { ty, optional }
         } else {
             let var = match (self.var, self.rename) {
                 (Some(var), _) => var.into_inner(),
@@ -309,10 +304,27 @@ mod tests {
             }
         });
 
-        let FieldKind::Nested { ty } = &fields[0].kind else {
+        let FieldKind::Nested { ty, optional } = &fields[0].kind else {
             panic!("expected nested field");
         };
         assert_eq!(tokens(ty), "Database");
+        assert!(!optional);
+    }
+
+    #[test]
+    fn optional_nested_field_uses_inner_type() {
+        let fields = parse_fields(parse_quote! {
+            struct Config {
+                #[env(nested)]
+                database: Option<Database>,
+            }
+        });
+
+        let FieldKind::Nested { ty, optional } = &fields[0].kind else {
+            panic!("expected nested field");
+        };
+        assert_eq!(tokens(ty), "Database");
+        assert!(optional);
     }
 
     #[test]

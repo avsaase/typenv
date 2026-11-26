@@ -18,6 +18,7 @@ pub fn expand(container: &Container) -> TokenStream {
         .map(|i| format_ident!("field_{}", i, span = Span::mixed_site()))
         .collect();
     let collects = fields.iter().map(|field| field_collect(field, &errors));
+    let presences = fields.iter().map(field_presence);
     let env_vars = env_vars::env_vars(container, env_vars::Placement::TopLevel);
     let nested_env_vars = env_vars::env_vars(container, env_vars::Placement::Nested);
 
@@ -38,7 +39,11 @@ pub fn expand(container: &Container) -> TokenStream {
     };
 
     quote! {
-        impl #impl_generics ::typenv::__private::Sealed for #ident #ty_generics #where_clause {}
+        impl #impl_generics ::typenv::__private::Sealed for #ident #ty_generics #where_clause {
+            fn __is_present() -> bool {
+                false #( || #presences )*
+            }
+        }
 
         impl #impl_generics ::typenv::FromEnv for #ident #ty_generics #where_clause {
             const ENV_VARS: &'static str = #env_vars;
@@ -79,12 +84,39 @@ fn field_collect(field: &Field, errors: &Ident) -> TokenStream {
     let span = field.span;
 
     match &field.kind {
-        FieldKind::Nested { ty } => quote_spanned! {span=>
+        FieldKind::Nested {
+            ty,
+            optional: false,
+        } => quote_spanned! {span=>
             #errors.handle_nested(#path, <#ty as ::typenv::FromEnv>::from_env())
+        },
+        FieldKind::Nested { ty, optional: true } => quote_spanned! {span=>
+            #errors.handle_nested_optional(
+                #path,
+                ::typenv::__private::optional_nested::<#ty>(),
+            )
         },
         FieldKind::Value(value) => {
             let call = value_call(path, span, value);
             quote! { #errors.handle(#call) }
+        }
+    }
+}
+
+/// An expression that is true if the field reads a set environment variable: directly for a value
+/// field, recursively for a nested one.
+fn field_presence(field: &Field) -> TokenStream {
+    let span = field.span;
+
+    match &field.kind {
+        FieldKind::Nested { ty, .. } => quote_spanned! {span=>
+            <#ty as ::typenv::__private::Sealed>::__is_present()
+        },
+        FieldKind::Value(value) => {
+            let var = &value.var;
+            quote_spanned! {span=>
+                ::typenv::__private::is_set(#var)
+            }
         }
     }
 }
