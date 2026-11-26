@@ -9,10 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1](https://github.com/avsaase/typenv/compare/typenv-v0.1.0...typenv-v0.1.1) - 2026-11-26
 
-### Other
-
-- Add support for optional nested structs
-
 ### Added
 
 - `#[env(nested)]` can now be used on `Option` fields. The nested struct is loaded only when one of
